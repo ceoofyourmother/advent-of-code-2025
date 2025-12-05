@@ -20,10 +20,11 @@ fn split_direction(s: &str) -> Option<(char, &str)> {
 
 fn get(slice: &[i32], idx: isize) -> i32 {
     let len = slice.len() as isize;
-    let idx = ((idx % len) + len) % len; // garante que fica positivo
+    let idx = ((idx % len) + len) % len; 
 
     slice[idx as usize]
 }
+
 
 pub fn day1() {
     let seq = read_file("./src/days/input.txt");
@@ -39,12 +40,12 @@ pub fn day1() {
                 let res = get(&interval, -(value - counter) as isize);
                 counter = res;
 
-                println!("resultado L {:?}", res);
+                println!("resultado L {:?},", res);
                 if res == 0 {
                     collisions += 1
                 }
             } else {
-                //iremos decrementar
+                //iremos incrementar
                 let value: i32 = value.parse().expect("deu erro, oxe?");
                 let res = get(&interval, (value + counter) as isize);
                 counter = res;
@@ -53,6 +54,67 @@ pub fn day1() {
                 if res == 0 {
                     collisions += 1
                 }
+            }
+        }
+    }
+    println!("Colisoes {:?}", collisions);
+}
+
+fn calculatotalcolitions(counter: i32, idx: i32) -> i32{
+
+    let res = counter + idx;
+    let collitions = res / 100;
+
+    return collitions.abs() 
+}
+
+fn spin_left(dial: i32, rot: i32) -> (i32, i32) {
+    let dial_long = dial - rot;
+    let mut revolutions  = (dial_long / 100).abs();
+    let new_dial = dial_long.rem_euclid(100);
+
+    if dial != 0 && dial_long <= 0 {
+        revolutions += 1;
+    }
+
+    (new_dial, revolutions)
+}
+
+fn spin_right(dial: i32, rot: i32) -> (i32, i32) {
+    let dial_long = dial + rot;
+    let mut revolutions  = (dial_long / 100).abs();
+    let new_dial = dial_long.rem_euclid(100);
+
+    if dial != 0 && dial_long <= 0 {
+        revolutions += 1;
+    }
+
+    (new_dial, revolutions)
+}
+
+
+pub fn day2() {
+    let seq = read_file("./src/days/input.txt");
+    let mut counter: i32 = 50;
+    let mut collisions: i32 = 0;
+
+    for x in seq {
+        if let Some((direction, value)) = split_direction(x) {
+            if direction == 'L' {
+                //iremos decrementar
+                let value: i32 = value.parse().expect("deu erro, oxe?");
+                let (new_dial, additional) = spin_left(counter, value);
+                counter = new_dial;
+                collisions += additional
+
+            } else {
+                //iremos incrementar
+                let value: i32 = value.parse().expect("deu erro, oxe?");
+                let (new_dial, additional) = spin_right(counter, value);
+                counter = new_dial;
+                collisions += additional
+
+
             }
         }
     }
